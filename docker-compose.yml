@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: django
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - django_network
+
+  app:
+    build: .
+    container_name: django_backend_app
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      ADMIN_PASS: ${ADMIN_PASS}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_SECRET_KEY: ${PAYPAL_SECRET_KEY}
+      PAYPAL_URL_API: ${PAYPAL_URL_API}
+      PORT: ${PORT}
+      RETURN_URL: ${RETURN_URL}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_KEY_ID: ${S3_KEY_ID}
+      S3_REGION: ${S3_REGION}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      SAS_HOST: ${SAS_HOST}
+      SAS_PASS: ${SAS_PASS}
+      SAS_USER: ${SAS_USER}
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    networks:
+      - django_network
+
+volumes:
+  postgres_data:
+
+networks:
+  django_network:
+    driver: bridge
